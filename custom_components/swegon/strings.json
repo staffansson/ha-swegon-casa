@@ -1,0 +1,101 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Swegon CASA",
+        "description": "Enter the credentials used at swegoncasa.io.",
+        "data": {
+          "username": "Email address",
+          "password": "Password"
+        }
+      },
+      "device": {
+        "title": "Select ventilation unit",
+        "data": {
+          "device_id": "Ventilation unit"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to Swegon CASA",
+      "invalid_auth": "Invalid username or password",
+      "no_devices": "No CASA units were found",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This unit is already configured"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "supply_temperature": {
+        "name": "Supply air temperature"
+      },
+      "return_temperature": {
+        "name": "Extract air temperature"
+      },
+      "intake_temperature": {
+        "name": "Outdoor air temperature"
+      },
+      "humidity": {
+        "name": "Humidity"
+      },
+      "absolute_humidity": {
+        "name": "Absolute humidity"
+      },
+      "co2": {
+        "name": "Carbon dioxide"
+      },
+      "air_quality": {
+        "name": "Air quality"
+      },
+      "fan_speed": {
+        "name": "Fan speed"
+      },
+      "ventilation_in": {
+        "name": "Supply fan level"
+      },
+      "ventilation_out": {
+        "name": "Extract fan level"
+      },
+      "boost_countdown": {
+        "name": "Boost time remaining"
+      }
+    },
+    "binary_sensor": {
+      "cloud_connection": {
+        "name": "Cloud connection"
+      }
+    },
+    "select": {
+      "operating_mode": {
+        "name": "Operating mode",
+        "state": {
+          "home": "Home",
+          "away": "Away",
+          "boost": "Boost",
+          "travel": "Travel",
+          "fireplace": "Fireplace",
+          "off": "Off"
+        }
+      }
+    },
+    "number": {
+      "supply_temperature_setpoint": {
+        "name": "Supply temperature setpoint"
+      },
+      "co2_home_limit": {
+        "name": "CO₂ limit at home"
+      },
+      "co2_away_limit": {
+        "name": "CO₂ limit away"
+      },
+      "away_temperature_drop": {
+        "name": "Temperature reduction away"
+      },
+      "travel_temperature_drop": {
+        "name": "Temperature reduction travel"
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "domain": "swegon_casa",
+  "name": "Swegon CASA Smart",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/staffansson/ha-swegon-casa",
+  "issue_tracker": "https://github.com/staffansson/ha-swegon-casaissues",
+  "iot_class": "cloud_push",
+  "requirements": [
+    "websockets>=14.0"
+  ],
+  "version": "0.1.0"
+}
