@@ -1,0 +1,101 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Anslut till Swegon CASA",
+        "description": "Ange dina inloggningsuppgifter för swegoncasa.io.",
+        "data": {
+          "username": "E-postadress",
+          "password": "Lösenord"
+        }
+      },
+      "device": {
+        "title": "Välj ventilationsenhet",
+        "data": {
+          "device_id": "Ventilationsenhet"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Misslyckades att ansluta till Swegon CASA",
+      "invalid_auth": "Felaktigt användarnamn eller lösenord",
+      "no_devices": "Inga CASA-enheter hittades",
+      "unknown": "Oväntat fel"
+    },
+    "abort": {
+      "already_configured": "Denna enhet är redan konfigurerad  "
+    }
+  },
+  "entity": {
+    "sensor": {
+      "supply_temperature": {
+        "name": "Tilluftstemperatur"
+      },
+      "return_temperature": {
+        "name": "Frånluftstemperatur"
+      },
+      "intake_temperature": {
+        "name": "Uteluftstemperatur"
+      },
+      "humidity": {
+        "name": "Luftfuktighet"
+      },
+      "absolute_humidity": {
+        "name": "Absolut luftfuktighet"
+      },
+      "co2": {
+        "name": "Koldioxid"
+      },
+      "air_quality": {
+        "name": "Luftkvalitet"
+      },
+      "fan_speed": {
+        "name": "Fläkthastighet"
+      },
+      "ventilation_in": {
+        "name": "Tilluftsfläktshastighet"
+      },
+      "ventilation_out": {
+        "name": "Frånluftsfläktshastighet"
+      },
+      "boost_countdown": {
+        "name": "Boost-timer"
+      }
+    },
+    "binary_sensor": {
+      "cloud_connection": {
+        "name": "Molnanslutning"
+      }
+    },
+    "select": {
+      "operating_mode": {
+        "name": " Driftsläge",
+        "state": {
+          "home": "Hemma",
+          "away": "Borta",
+          "boost": "Boost",
+          "travel": "Resa",
+          "fireplace": "Eldstaf",
+          "off": "Av"
+        }
+      }
+    },
+    "number": {
+      "supply_temperature_setpoint": {
+        "name": "Tilluftstemperatur mål"
+      },
+      "co2_home_limit": {
+        "name": "CO₂ gräns hemma"
+      },
+      "co2_away_limit": {
+        "name": "CO₂ gräns borta"
+      },
+      "away_temperature_drop": {
+        "name": "Temperaturminskning borta"
+      },
+      "travel_temperature_drop": {
+        "name": "Temperaturminskning resa"
+      }
+    }
+  }
+}
