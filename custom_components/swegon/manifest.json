@@ -4,7 +4,7 @@
   "codeowners": [],
   "config_flow": true,
   "documentation": "https://github.com/staffansson/ha-swegon-casa",
-  "issue_tracker": "https://github.com/staffansson/ha-swegon-casaissues",
+  "issue_tracker": "https://github.com/staffansson/ha-swegon-casa/issues",
   "iot_class": "cloud_push",
   "requirements": [
     "websockets>=14.0"
