@@ -219,3 +219,29 @@ __marimo__/
 
 # Visual Studio
 .vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Home Assistant development
+config/
+.storage/
+home-assistant.log*
+home-assistant_v2.db*
+secrets.yaml
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Operating system
+.DS_Store
+Thumbs.db
+desktop.ini
