@@ -30,15 +30,18 @@ OPTIONS = [
 ]
 
 FAN_MODE_VALUES = {
-    MODE_AWAY: 0,
-    MODE_HOME: 1,
-    MODE_BOOST: 2,
+    MODE_AWAY: 1,
+    MODE_HOME: 2,
+    MODE_BOOST: 3,
 }
 
 FAN_VALUE_TO_MODE = {
-    0: MODE_AWAY,
-    1: MODE_HOME,
-    2: MODE_BOOST,
+    1: MODE_AWAY,
+    2: MODE_HOME,
+    3: MODE_BOOST,
+    4: MODE_TRAVEL,
+    5: MODE_OFF,
+    6: MODE_FIREPLACE,
 }
 
 
