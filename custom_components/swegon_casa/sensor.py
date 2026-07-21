@@ -27,6 +27,7 @@ from .const import (
     OBJECT_CURRENT_FAN_SPEED,
     OBJECT_FAN_MODE,
     OBJECT_FIREPLACE,
+    OBJECT_FIREPLACE_MODE,
     OBJECT_HUMIDITY,
     OBJECT_HUMIDITY_AMOUNT,
     OBJECT_INTAKE_TEMPERATURE,
@@ -266,7 +267,7 @@ class SwegonCasaOperatingStatusSensor(
         values = self.coordinator.data.get("values", {})
 
         fireplace_value = _as_int(
-            values.get(OBJECT_FIREPLACE)
+            values.get(OBJECT_FIREPLACE_MODE)
         )
         power_off_value = _as_int(
             values.get(OBJECT_POWER_OFF)
