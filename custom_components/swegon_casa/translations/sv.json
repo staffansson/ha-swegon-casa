@@ -62,6 +62,19 @@
         "name": "Boost-timer"
       }
     },
+    "operating_status": {
+      "name": "Aktuell status",
+      "state": {
+        "home": "Hemma",
+        "away": "Borta",
+        "boost": "Forcering",
+        "travel": "På resa",
+        "fireplace": "Brasfunktion",
+        "off": "Stoppad",
+        "automatic_humidity": "Automatisk fuktstyrning",
+        "summer_night_cooling": "Sommarnattkyla"
+      }
+    },
     "binary_sensor": {
       "cloud_connection": {
         "name": "Molnanslutning"
@@ -69,14 +82,14 @@
     },
     "select": {
       "operating_mode": {
-        "name": " Driftsläge",
+        "name": "Driftsläge",
         "state": {
           "home": "Hemma",
           "away": "Borta",
-          "boost": "Boost",
-          "travel": "Resa",
-          "fireplace": "Eldstad",
-          "off": "Av"
+          "boost": "Forcering",
+          "travel": "På resa",
+          "fireplace": "Brasfunktion",
+          "off": "Stäng av"
         }
       }
     },

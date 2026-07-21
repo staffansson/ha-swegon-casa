@@ -25,9 +25,12 @@ from .const import (
     OBJECT_BOOST_COUNTDOWN,
     OBJECT_CO2,
     OBJECT_CURRENT_FAN_SPEED,
+    OBJECT_FAN_MODE,
+    OBJECT_FIREPLACE,
     OBJECT_HUMIDITY,
     OBJECT_HUMIDITY_AMOUNT,
     OBJECT_INTAKE_TEMPERATURE,
+    OBJECT_POWER_OFF,
     OBJECT_RETURN_TEMPERATURE,
     OBJECT_SUPPLY_TEMPERATURE,
     OBJECT_VENTILATION_IN,
@@ -36,6 +39,43 @@ from .const import (
 from .coordinator import SwegonCasaCoordinator
 from .entity import SwegonCasaEntity
 
+STATUS_HOME = "home"
+STATUS_AWAY = "away"
+STATUS_BOOST = "boost"
+STATUS_TRAVEL = "travel"
+STATUS_FIREPLACE = "fireplace"
+STATUS_OFF = "off"
+STATUS_AUTO_HUMIDITY = "automatic_humidity"
+STATUS_SUMMER_NIGHT = "summer_night_cooling"
+
+OPERATING_STATUS_OPTIONS = [
+    STATUS_HOME,
+    STATUS_AWAY,
+    STATUS_BOOST,
+    STATUS_TRAVEL,
+    STATUS_FIREPLACE,
+    STATUS_OFF,
+    STATUS_AUTO_HUMIDITY,
+    STATUS_SUMMER_NIGHT,
+]
+
+FAN_VALUE_TO_STATUS = {
+    1: STATUS_AWAY,
+    2: STATUS_HOME,
+    3: STATUS_BOOST,
+    4: STATUS_TRAVEL,
+}
+
+
+def _as_int(value: Any) -> int | None:
+    """Convert a Swegon value to int when possible."""
+    if value is None:
+        return None
+
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return None
 
 @dataclass(frozen=True, kw_only=True)
 class SwegonSensorDescription(SensorEntityDescription):
@@ -132,16 +172,28 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     coordinator: SwegonCasaCoordinator = entry.runtime_data
+    device_id = entry.data[CONF_DEVICE_ID]
+    device_name = entry.data[CONF_DEVICE_NAME]
 
-    async_add_entities(
+    entities: list[SensorEntity] = [
         SwegonCasaSensor(
             coordinator,
-            entry.data[CONF_DEVICE_ID],
-            entry.data[CONF_DEVICE_NAME],
+            device_id,
+            device_name,
             description,
         )
         for description in SENSORS
+    ]
+
+    entities.append(
+        SwegonCasaOperatingStatusSensor(
+            coordinator,
+            device_id,
+            device_name,
+        )
     )
+
+    async_add_entities(entities)
 
 
 class SwegonCasaSensor(SwegonCasaEntity, SensorEntity):
@@ -182,3 +234,69 @@ class SwegonCasaSensor(SwegonCasaEntity, SensorEntity):
             return numeric_value / 10
 
         return numeric_value
+
+class SwegonCasaOperatingStatusSensor(
+    SwegonCasaEntity,
+    SensorEntity,
+):
+    """Report the effective operating status."""
+
+    _attr_translation_key = "operating_status"
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = OPERATING_STATUS_OPTIONS
+
+    def __init__(
+        self,
+        coordinator: SwegonCasaCoordinator,
+        device_id: str,
+        device_name: str,
+    ) -> None:
+        # Detta är ett syntetiskt objekt-id som endast används för
+        # entitetens unika id. Sensorn kombinerar flera riktiga objekt.
+        super().__init__(
+            coordinator,
+            device_id,
+            device_name,
+            "operating_status",
+        )
+
+    @property
+    def native_value(self) -> str | None:
+        """Return the effective status shown by the unit."""
+        values = self.coordinator.data.get("values", {})
+
+        fireplace_value = _as_int(
+            values.get(OBJECT_FIREPLACE)
+        )
+        power_off_value = _as_int(
+            values.get(OBJECT_POWER_OFF)
+        )
+        fan_mode_value = _as_int(
+            values.get(OBJECT_FAN_MODE)
+        )
+
+        # Priority:
+        # 1. Stopped
+        # 2. Fireplace
+        # 3. Smart functions
+        # 4. Modes
+
+        if power_off_value == 1:
+            return STATUS_OFF
+
+        if fireplace_value == 1:
+            return STATUS_FIREPLACE
+
+        # Vi vet ännu inte vilka objekt som anger att dessa funktioner
+        # faktiskt är aktiva. OBJECT_AUTO_HUMIDITY_MODE och
+        # OBJECT_SUMMER_NIGHT_MODE verkar vara inställningar, inte status.
+        #
+        # När statusobjekten identifierats läggs exempelvis detta till:
+        #
+        # if automatic_humidity_active == 1:
+        #     return STATUS_AUTO_HUMIDITY
+        #
+        # if summer_night_active == 1:
+        #     return STATUS_SUMMER_NIGHT
+
+        return FAN_VALUE_TO_STATUS.get(fan_mode_value)
