@@ -27,6 +27,7 @@ from .const import (
     OBJECT_CURRENT_FAN_SPEED,
     OBJECT_FAN_MODE,
     OBJECT_FIREPLACE_MODE,
+    OBJECT_SUMMER_NIGHT_MODE,
     OBJECT_HUMIDITY,
     OBJECT_HUMIDITY_AMOUNT,
     OBJECT_INTAKE_TEMPERATURE,
@@ -275,6 +276,10 @@ class SwegonCasaOperatingStatusSensor(
             values.get(OBJECT_FAN_MODE)
         )
 
+        summer_night_value = _as_int(
+            values.get(OBJECT_SUMMER_NIGHT_MODE)
+        )
+
         # Priority:
         # 1. Stopped
         # 2. Fireplace
@@ -287,6 +292,9 @@ class SwegonCasaOperatingStatusSensor(
         if fireplace_value == 1:
             return STATUS_FIREPLACE
 
+        if summer_night_value is not None and summer_night_value > 0:
+            return STATUS_SUMMER_NIGHT
+
         # Vi vet ännu inte vilka objekt som anger att dessa funktioner
         # faktiskt är aktiva. OBJECT_AUTO_HUMIDITY_MODE och
         # OBJECT_SUMMER_NIGHT_MODE verkar vara inställningar, inte status.
@@ -296,7 +304,5 @@ class SwegonCasaOperatingStatusSensor(
         # if automatic_humidity_active == 1:
         #     return STATUS_AUTO_HUMIDITY
         #
-        # if summer_night_active == 1:
-        #     return STATUS_SUMMER_NIGHT
 
         return FAN_VALUE_TO_STATUS.get(fan_mode_value)
