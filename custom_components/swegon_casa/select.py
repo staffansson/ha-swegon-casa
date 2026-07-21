@@ -95,7 +95,7 @@ class SwegonCasaModeSelect(SwegonCasaEntity, SelectEntity):
         """Return the currently selectable operating status."""
         value = self.coordinator.data.get("values", {})
 
-        fireplace_value = _as_int(values.get(OBJECT_FIREPLACE))
+        fireplace_value = _as_int(values.get(OBJECT_FIREPLACE_MODE))
         power_off_value = _as_int(values.get(OBJECT_POWER_OFF))
         fan_mode_value = _as_int(values.get(OBJECT_FAN_MODE))
 
