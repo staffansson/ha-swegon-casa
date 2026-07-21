@@ -104,12 +104,15 @@ class SwegonCasaModeSelect(SwegonCasaEntity, SelectEntity):
                 OBJECT_FAN_MODE,
                 FAN_MODE_VALUES[option],
             )
+        if option == MODE_BOOST:
+            await client.async_write("116", 1)
 
         elif option == MODE_OFF:
             await client.async_write(
                 OBJECT_POWER_OFF,
                 1,
             )
+
 
         elif option == MODE_TRAVEL:
             await client.async_write("112", 1)
