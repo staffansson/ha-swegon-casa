@@ -60,19 +60,19 @@
       },
       "boost_countdown": {
         "name": "Boost-timer"
-      }
-    },
-    "operating_status": {
-      "name": "Aktuell status",
-      "state": {
-        "home": "Hemma",
-        "away": "Borta",
-        "boost": "Forcering",
-        "travel": "På resa",
-        "fireplace": "Brasfunktion",
-        "off": "Stoppad",
-        "automatic_humidity": "Automatisk fuktstyrning",
-        "summer_night_cooling": "Sommarnattkyla"
+      },
+      "operating_status": {
+        "name": "Aktuell status",
+        "state": {
+          "home": "Hemma",
+          "away": "Borta",
+          "boost": "Forcering",
+          "travel": "På resa",
+          "fireplace": "Brasfunktion",
+          "off": "Stoppad",
+          "automatic_humidity": "Automatisk fuktstyrning",
+          "summer_night_cooling": "Sommarnattkyla"
+        } 
       }
     },
     "binary_sensor": {

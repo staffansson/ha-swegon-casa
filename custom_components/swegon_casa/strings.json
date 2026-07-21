@@ -60,21 +60,22 @@
       },
       "boost_countdown": {
         "name": "Boost time remaining"
-      }
+      },
+      "operating_status": {
+        "name": "Current status",
+        "state": {
+          "home": "Home",
+          "away": "Away",
+          "boost": "Boost",
+          "travel": "Travel",
+          "fireplace": "Fireplace",
+          "off": "Stopped",
+          "automatic_humidity": "Automatic humidity control",
+          "summer_night_cooling": "Summer night cooling"
+        }
+      } 
     },
-    "operating_status": {
-      "name": "Current status",
-      "state": {
-        "home": "Home",
-        "away": "Away",
-        "boost": "Boost",
-        "travel": "Travel",
-        "fireplace": "Fireplace",
-        "off": "Stopped",
-        "automatic_humidity": "Automatic humidity control",
-        "summer_night_cooling": "Summer night cooling"
-      }
-    },
+    
     "binary_sensor": {
       "cloud_connection": {
         "name": "Cloud connection"

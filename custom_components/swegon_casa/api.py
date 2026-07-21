@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import ssl
 import json
 import logging
 from collections.abc import Callable
@@ -53,6 +54,8 @@ class SwegonCasaClient:
         self._websocket: ClientConnection | None = None
         self._listen_task: asyncio.Task | None = None
         self._keepalive_task: asyncio.Task | None = None
+
+        self._ssl_context: ssl.SSLContext | None = None
 
         self._callbacks: list[Callable[[dict[str, Any]], None]] = []
         self._connected = False
@@ -125,6 +128,13 @@ class SwegonCasaClient:
         self._closing = False
 
         try:
+            if self._ssl_context is None:
+                loop = asyncio.get_running_loop()
+                self._ssl_context = await loop.run_in_executor(
+                    None,
+                    ssl.create_default_context,
+                )
+
             self._websocket = await websockets.connect(
                 WEBSOCKET_URL,
                 origin=ORIGIN,
