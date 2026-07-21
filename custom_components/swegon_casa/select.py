@@ -93,7 +93,7 @@ class SwegonCasaModeSelect(SwegonCasaEntity, SelectEntity):
     @property
     def current_option(self) -> str | None:
         """Return the currently selectable operating status."""
-        value = self.coordinator.data.get("values", {})
+        values = self.coordinator.data.get("values", {})
 
         fireplace_value = _as_int(values.get(OBJECT_FIREPLACE_MODE))
         power_off_value = _as_int(values.get(OBJECT_POWER_OFF))
@@ -113,28 +113,24 @@ class SwegonCasaModeSelect(SwegonCasaEntity, SelectEntity):
         values = self.coordinator.data.get("values", {})
 
         fireplace_active = (
-            _as_int(values.get("153")) == 1
+            _as_int(values.get(OBJECT_FIREPLACE_MODE)) == 1
         )
 
         # Chosing a regular mode stops current fireplace-function
         if option != MODE_FIREPLACE and fireplace_active:
-            await client.async_write("153", 0)
+            await client.async_write(OBJECT_FIREPLACE_MODE, 0)
 
         if option in FAN_MODE_VALUES:
-            await client.async_write("111",FAN_MODE_VALUES[option])
-        
-        elif option == MODE_BOOST:
-            await client.async_write("116", 1)
-
+            await client.async_write(OBJECT_FAN_MODE,FAN_MODE_VALUES[option])
 
         elif option == MODE_TRAVEL:
             await client.async_write("112", 1)
             await client.async_write("154", 1)
 
         elif option == MODE_FIREPLACE:
-            await client.async_write("153", 1)
+            await client.async_write(OBJECT_FIREPLACE_MODE, 1)
 
         elif option == MODE_OFF:
-            await client.async_write("155", 1)
+            await client.async_write(OBJECT_POWER_OFF, 1)
 
         self.async_write_ha_state()
