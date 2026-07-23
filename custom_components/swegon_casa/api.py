@@ -24,6 +24,10 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+# Temporary object discovery. Remove after debugging.
+DEBUG_DISCOVER_OBJECTS = True
+DEBUG_OBJECT_ID_MIN = 1
+DEBUG_OBJECT_ID_MAX = 500
 
 class SwegonCasaError(Exception):
     """Base exception."""
@@ -60,6 +64,8 @@ class SwegonCasaClient:
         self._callbacks: list[Callable[[dict[str, Any]], None]] = []
         self._connected = False
         self._closing = False
+
+        self._seen_object_ids: set[str] = set()
 
     @property
     def connected(self) -> bool:
@@ -189,6 +195,23 @@ class SwegonCasaClient:
             },
         }
 
+        if DEBUG_DISCOVER_OBJECTS:
+            subscribed_object_ids = [
+                str(object_id)
+                for object_id in range(
+                    DEBUG_OBJECT_ID_MIN,
+                    DEBUG_OBJECT_ID_MAX + 1,
+                )
+            ]
+
+            _LOGGER.warning(
+                "Temporary object discovery enabled: subscribing to objects %s-%s",
+                DEBUG_OBJECT_ID_MIN,
+                DEBUG_OBJECT_ID_MAX,
+            )
+        else:
+            subscribed_object_ids = list(SUBSCRIBED_OBJECTS)
+        
         subscribe_message = {
             "jsonrpc": "2.0",
             "id": 2,
@@ -200,7 +223,7 @@ class SwegonCasaClient:
                         "device": DEVICE_ADDRESS,
                         "properties": {PROPERTY_VALUE: {}},
                     }
-                    for object_id in SUBSCRIBED_OBJECTS
+                    for object_id in subscribed_object_ids
                 ]
             },
         }
@@ -325,11 +348,35 @@ class SwegonCasaClient:
         for obj in objects:
             object_id = str(obj.get("id"))
             properties = obj.get("properties", {})
-            value_data = properties.get(PROPERTY_VALUE, {})
-            value = value_data.get("value")
 
-            if value is not None:
-                updates[object_id] = value
+        # Log every property, even if it is not property 85.
+        for property_id, property_data in properties.items():
+            if not isinstance(property_data, dict):
+                continue
+
+            property_value = property_data.get("value")
+
+            _LOGGER.debug(
+                "Swegon object update: object=%s property=%s value=%r",
+                object_id,
+                property_id,
+                property_value,
+            )
+
+        value_data = properties.get(PROPERTY_VALUE, {})
+        value = value_data.get("value")
+
+        if object_id not in self._seen_object_ids:
+            self._seen_object_ids.add(object_id)
+
+            _LOGGER.warning(
+                "Swegon object discovered: object=%s properties=%s",
+                object_id,
+                properties,
+            )
+
+        if value is not None:
+            updates[object_id] = value
 
         if updates:
             self._notify_callbacks(
