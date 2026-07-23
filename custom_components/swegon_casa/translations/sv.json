@@ -72,7 +72,27 @@
           "off": "Stoppad",
           "automatic_humidity": "Automatisk fuktstyrning",
           "summer_night_cooling": "Sommarnattkyla"
-        } 
+        }
+      },
+      "smart_humidity_control": {
+        "name": "Smart fuktstyrning",
+        "state": {
+          "active": "Aktiverad",
+          "inactive": "Ej aktiverad"
+        }
+      },
+      "summer_night_cooling": {
+        "name": "Sommarnattkyla",
+        "state": {
+          "active": "Aktiverad",
+          "inactive": "Ej aktiverad"
+        }
+      },
+      "smart_humidity_control_effect": {
+        "name": "Effekt för smart fuktstyrning"
+      },
+      "summer_night_cooling_effect": {
+        "name": "Effekt för sommarnattkyla"
       }
     },
     "binary_sensor": {
@@ -90,6 +110,39 @@
           "travel": "På resa",
           "fireplace": "Brasfunktion",
           "off": "Stäng av"
+        }
+      },
+      "smart_humidity_control_level": {
+        "name": "Nivå för smart fuktstyrning",
+        "state": {
+          "off": "Av",
+          "low": "Låg",
+          "normal": "Normal",
+          "high": "Hög",
+          "full": "Full",
+          "user": "Användare"
+        }
+      },
+      "summer_night_cooling_boost_level": {
+        "name": "Effektnivå för sommarnattkyla",
+        "state": {
+          "off": "Av",
+          "low": "Låg",
+          "normal": "Normal",
+          "high": "Hög",
+          "full": "Full",
+          "user": "Användare"
+        }
+      },
+      "summer_night_cooling_activation_level": {
+        "name": "Aktiveringsnivå för sommarnattkyla",
+        "state": {
+          "off": "Av",
+          "low": "Låg",
+          "normal": "Normal",
+          "high": "Hög",
+          "full": "Full",
+          "user": "Användare"
         }
       }
     },

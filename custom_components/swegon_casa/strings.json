@@ -73,9 +73,28 @@
           "automatic_humidity": "Automatic humidity control",
           "summer_night_cooling": "Summer night cooling"
         }
-      } 
+      },
+      "smart_humidity_control": {
+        "name": "Smart humidity control",
+        "state": {
+          "active": "Active",
+          "inactive": "Inactive"
+        }
+      },
+      "summer_night_cooling": {
+        "name": "Summer night cooling",
+        "state": {
+          "active": "Active",
+          "inactive": "Inactive"
+        }
+      },
+      "smart_humidity_control_effect": {
+        "name": "Smart humidity control effect"
+      },
+      "summer_night_cooling_effect": {
+        "name": "Summer night cooling effect"
+      }
     },
-    
     "binary_sensor": {
       "cloud_connection": {
         "name": "Cloud connection"
@@ -91,6 +110,39 @@
           "travel": "Travel",
           "fireplace": "Fireplace",
           "off": "Off"
+        }
+      },
+      "smart_humidity_control_level": {
+        "name": "Smart humidity control level",
+        "state": {
+          "off": "Off",
+          "low": "Low",
+          "normal": "Normal",
+          "high": "High",
+          "full": "Full",
+          "user": "User"
+        }
+      },
+      "summer_night_cooling_boost_level": {
+        "name": "Summer night cooling boost level",
+        "state": {
+          "off": "Off",
+          "low": "Low",
+          "normal": "Normal",
+          "high": "High",
+          "full": "Full",
+          "user": "User"
+        }
+      },
+      "summer_night_cooling_activation_level": {
+        "name": "Summer night cooling activation level",
+        "state": {
+          "off": "Off",
+          "low": "Low",
+          "normal": "Normal",
+          "high": "High",
+          "full": "Full",
+          "user": "User" 
         }
       }
     },

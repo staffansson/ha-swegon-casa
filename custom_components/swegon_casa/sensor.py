@@ -25,12 +25,13 @@ from .const import (
     OBJECT_BOOST_COUNTDOWN,
     OBJECT_CO2,
     OBJECT_CURRENT_FAN_SPEED,
-    OBJECT_FAN_MODE,
-    OBJECT_FIREPLACE_MODE,
-    OBJECT_SUMMER_NIGHT_MODE,
     OBJECT_HUMIDITY,
     OBJECT_HUMIDITY_AMOUNT,
-    OBJECT_AUTO_HUMIDITY_MODE,
+    OBJECT_HUMIDITY_BOOST,
+    OBJECT_SUMMER_NIGHT_COOLING_BOOST,
+    OBJECT_FAN_MODE,
+    OBJECT_FIREPLACE_MODE,
+    OBJECT_SMART_HUMIDITY_LEVEL,
     OBJECT_INTAKE_TEMPERATURE,
     OBJECT_POWER_OFF,
     OBJECT_RETURN_TEMPERATURE,
@@ -48,7 +49,7 @@ STATUS_TRAVEL = "travel"
 STATUS_FIREPLACE = "fireplace"
 STATUS_OFF = "off"
 STATUS_AUTO_HUMIDITY = "automatic_humidity"
-STATUS_SUMMER_NIGHT = "summer_night_cooling"
+STATUS_SUMMER_NIGHT = "SUMMER_NIGHT_cooling"
 
 OPERATING_STATUS_OPTIONS = [
     STATUS_HOME,
@@ -68,6 +69,14 @@ FAN_VALUE_TO_STATUS = {
     4: STATUS_TRAVEL,
 }
 
+FUNCTION_STATUS_ACTIVE = "active"
+FUNCTION_STATUS_INACTIVE = "inactive"
+
+FUNCTION_STATUS_OPTIONS = [
+    FUNCTION_STATUS_ACTIVE,
+    FUNCTION_STATUS_INACTIVE,
+]
+
 
 def _as_int(value: Any) -> int | None:
     """Convert a Swegon value to int when possible."""
@@ -76,6 +85,16 @@ def _as_int(value: Any) -> int | None:
 
     try:
         return int(float(value))
+    except (TypeError, ValueError):
+        return None
+
+def _as_float(value: Any) -> float | None:
+    """Convert a Swegon value to float when possible."""
+    if value is None:
+        return None
+
+    try:
+        return float(value)
     except (TypeError, ValueError):
         return None
 
@@ -197,6 +216,43 @@ async def async_setup_entry(
 
     async_add_entities(entities)
 
+    entities.extend(
+    [
+        SwegonCasaFunctionStatusSensor(
+            coordinator=coordinator,
+            device_id=device_id,
+            device_name=device_name,
+            object_id=OBJECT_HUMIDITY_BOOST,
+            translation_key="smart_humidity_control",
+            unique_key="smart_humidity_control_status",
+        ),
+        SwegonCasaFunctionStatusSensor(
+            coordinator=coordinator,
+            device_id=device_id,
+            device_name=device_name,
+            object_id=OBJECT_SUMMER_NIGHT_COOLING_BOOST,
+            translation_key="summer_night_cooling",
+            unique_key="summer_night_cooling_status",
+        ),
+        SwegonCasaBoostPercentageSensor(
+            coordinator=coordinator,
+            device_id=device_id,
+            device_name=device_name,
+            object_id=OBJECT_HUMIDITY_BOOST,
+            translation_key="smart_humidity_control_effect",
+            unique_key="smart_humidity_control_effect",
+        ),
+        SwegonCasaBoostPercentageSensor(
+            coordinator=coordinator,
+            device_id=device_id,
+            device_name=device_name,
+            object_id=OBJECT_SUMMER_NIGHT_COOLING_BOOST,
+            translation_key="summer_night_cooling_effect",
+            unique_key="summer_night_cooling_effect",
+        ),
+    ]
+)
+
 
 class SwegonCasaSensor(SwegonCasaEntity, SensorEntity):
     entity_description: SwegonSensorDescription
@@ -236,6 +292,90 @@ class SwegonCasaSensor(SwegonCasaEntity, SensorEntity):
             return numeric_value / 10
 
         return numeric_value
+
+class SwegonCasaFunctionStatusSensor(
+    SwegonCasaEntity,
+    SensorEntity,
+):
+    """Report whether a smart ventilation function is active."""
+
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = FUNCTION_STATUS_OPTIONS
+
+    def __init__(
+        self,
+        coordinator: SwegonCasaCoordinator,
+        device_id: str,
+        device_name: str,
+        object_id: str,
+        translation_key: str,
+        unique_key: str,
+    ) -> None:
+        super().__init__(
+            coordinator,
+            device_id,
+            device_name,
+            unique_key,
+        )
+
+        self._source_object_id = object_id
+        self._attr_translation_key = translation_key
+
+    @property
+    def native_value(self) -> str | None:
+        """Return whether the function currently produces boost."""
+        values = self.coordinator.data.get("values", {})
+        value = _as_float(values.get(self._source_object_id))
+
+        if value is None:
+            return None
+
+        if value > 0:
+            return FUNCTION_STATUS_ACTIVE
+
+        return FUNCTION_STATUS_INACTIVE
+
+class SwegonCasaBoostPercentageSensor(
+    SwegonCasaEntity,
+    SensorEntity,
+):
+    """Report the current boost level as a percentage."""
+
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_suggested_display_precision = 0
+
+    def __init__(
+        self,
+        coordinator: SwegonCasaCoordinator,
+        device_id: str,
+        device_name: str,
+        object_id: str,
+        translation_key: str,
+        unique_key: str,
+    ) -> None:
+        super().__init__(
+            coordinator,
+            device_id,
+            device_name,
+            unique_key,
+        )
+
+        self._source_object_id = object_id
+        self._attr_translation_key = translation_key
+
+    @property
+    def native_value(self) -> int | None:
+        """Return the current 0-20 boost value as 0-100 percent."""
+        values = self.coordinator.data.get("values", {})
+        value = _as_float(values.get(self._source_object_id))
+
+        if value is None:
+            return None
+
+        percentage = round(value / 20 * 100)
+
+        return max(0, min(100, percentage))
 
 class SwegonCasaOperatingStatusSensor(
     SwegonCasaEntity,
@@ -277,13 +417,13 @@ class SwegonCasaOperatingStatusSensor(
             values.get(OBJECT_FAN_MODE)
         )
 
-        summer_night_value = _as_int(
-            values.get(OBJECT_SUMMER_NIGHT_MODE)
+        summer_night_boost = _as_float(
+            values.get(OBJECT_SUMMER_NIGHT_COOLING_BOOST)
         )
 
-        automatic_humidity_value = _as_int(
-            values.get(OBJECT_AUTO_HUMIDITY_MODE)
-)
+        humidity_boost = _as_float(
+            values.get(OBJECT_HUMIDITY_BOOST)
+        )
 
         # Priority:
         # 1. Stopped
@@ -297,20 +437,10 @@ class SwegonCasaOperatingStatusSensor(
         if fireplace_value == 1:
             return STATUS_FIREPLACE
 
-        if summer_night_value is not None and summer_night_value > 0:
+        if summer_night_boost is not None and summer_night_boost > 0:
             return STATUS_SUMMER_NIGHT
 
-        if automatic_humidity_value is not None and automatic_humidity_value > 0:
+        if humidity_boost is not None and humidity_boost > 0:
             return STATUS_AUTO_HUMIDITY
-
-        # Vi vet ännu inte vilka objekt som anger att dessa funktioner
-        # faktiskt är aktiva. OBJECT_AUTO_HUMIDITY_MODE och
-        # OBJECT_SUMMER_NIGHT_MODE verkar vara inställningar, inte status.
-        #
-        # När statusobjekten identifierats läggs exempelvis detta till:
-        #
-        # if automatic_humidity_active == 1:
-        #     return STATUS_AUTO_HUMIDITY
-        #
 
         return FAN_VALUE_TO_STATUS.get(fan_mode_value)
