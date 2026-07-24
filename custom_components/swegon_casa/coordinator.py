@@ -11,8 +11,13 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .api import SwegonCasaClient
+from .const import DEBUG_LOGGING
 
 _LOGGER = logging.getLogger(__name__)
+
+_LOGGER.setLevel(
+    logging.DEBUG if DEBUG_LOGGING else logging.INFO
+)
 
 
 class SwegonCasaCoordinator(
@@ -92,9 +97,11 @@ class SwegonCasaCoordinator(
             try:
                 await self.client.async_connect()
                 return
-            except Exception:
+            except Exception as err:
                 _LOGGER.warning(
-                    "Unable to reconnect to Swegon CASA; retrying"
+                    "Unable to reconnect to Swegon CASA; retrying in %s seconds: %s",
+                    delay,
+                    err,
                 )
                 delay = min(delay * 2, 300)
 

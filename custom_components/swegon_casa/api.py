@@ -12,6 +12,7 @@ import websockets
 from websockets.asyncio.client import ClientConnection
 
 from .const import (
+    DEBUG_LOGGING,
     DEVICE_ADDRESS,
     KEEPALIVE_INTERVAL,
     LOGIN_URL,
@@ -23,8 +24,14 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+_WEBSOCKET_LOGGER = logging.getLogger(
+    "custom_components.swegon_casa.websocket"
+)
 
-DEBUG_LOGGING = False
+_LOG_LEVEL = logging.DEBUG if DEBUG_LOGGING else logging.INFO
+
+_LOGGER.setLevel(_LOG_LEVEL)
+_WEBSOCKET_LOGGER.setLevel(_LOG_LEVEL)
 
 # Object discovery is separate from normal detailed logging.
 # Enabling this subscribes to a large object range.
@@ -166,6 +173,7 @@ class SwegonCasaClient:
                 WEBSOCKET_URL,
                 origin=ORIGIN,
                 ssl=self._ssl_context,
+                logger=_WEBSOCKET_LOGGER,
                 open_timeout=20,
                 close_timeout=10,
             )

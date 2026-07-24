@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Final
 
+DEBUG_LOGGING = False
+
 DOMAIN: Final = "swegon_casa"
 
 CONF_DEVICE_ID: Final = "device_id"
