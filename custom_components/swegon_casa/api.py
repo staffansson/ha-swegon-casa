@@ -24,10 +24,21 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-# Temporary object discovery. Remove after debugging.
+DEBUG_LOGGING = True
+
+# Object discovery is separate from normal detailed logging.
+# Enabling this subscribes to a large object range.
 DEBUG_DISCOVER_OBJECTS = False
 DEBUG_OBJECT_ID_MIN = 1
 DEBUG_OBJECT_ID_MAX = 500
+
+if DEBUG_LOGGING:
+    _LOGGER.setLevel(logging.DEBUG)
+
+def _debug(message: str, *args: Any) -> None:
+    """Log detailed protocol information when debug is enabled."""
+    if DEBUG_LOGGING:
+        _LOGGER.debug(message, *args)
 
 class SwegonCasaError(Exception):
     """Base exception."""
@@ -122,11 +133,24 @@ class SwegonCasaClient:
             )
 
         self._token = token
-        return data.get("devices", [])
+
+        devices = data.get("devices", [])
+
+        _debug(
+            "Swegon CASA login succeeded; %s device(s) returned",
+            len(devices),
+        )
+
+        return devices
 
     async def async_connect(self) -> None:
         if not self._device_id:
             raise SwegonCasaConnectionError("No device ID configured")
+
+        _debug(
+            "Connecting to Swegon CASA WebSocket for device %s",
+            self._device_id,
+        )
 
         if not self._token:
             await self.async_login()
@@ -154,6 +178,12 @@ class SwegonCasaClient:
 
         self._connected = True
 
+        _LOGGER.info(
+            "Connected to Swegon CASA device %s",
+            self._device_id,
+        )
+
+
         await self._async_send_connect_packet()
 
         self._listen_task = asyncio.create_task(
@@ -175,6 +205,11 @@ class SwegonCasaClient:
             "token": self._token,
         }
 
+        _debug(
+            "Sending Socket.IO connect packet for device %s at %s",
+            self._device_id,
+            connect_data["date"],
+        )
         await self._websocket.send(
             f"40{json.dumps(connect_data, separators=(',', ':'))}"
         )
@@ -204,14 +239,19 @@ class SwegonCasaClient:
                 )
             ]
 
-            _LOGGER.warning(
-                "Temporary object discovery enabled: subscribing to objects %s-%s",
+            _LOGGER.debug(
+                "Swegon CASA object discovery is enabled; subscribing to objects %s-%s",
                 DEBUG_OBJECT_ID_MIN,
                 DEBUG_OBJECT_ID_MAX,
             )
         else:
             subscribed_object_ids = list(SUBSCRIBED_OBJECTS)
         
+            _debug(
+            "Subscribing to %s Swegon CASA objects: %s",
+            len(subscribed_object_ids),
+            subscribed_object_ids,
+)
         subscribe_message = {
             "jsonrpc": "2.0",
             "id": 2,
@@ -232,8 +272,16 @@ class SwegonCasaClient:
         await self._async_send_rpc(subscribe_message)
 
     async def _async_send_rpc(self, message: dict[str, Any]) -> None:
+        """Send a JSON-RPC message."""
         if not self._websocket:
-            raise SwegonCasaConnectionError("Websocket is not connected")
+            raise SwegonCasaConnectionError(
+                "Websocket is not connected"
+            )
+
+        _debug(
+            "Sending Swegon CASA RPC message: %s",
+            json.dumps(message, separators=(",", ":")),
+        )
 
         socket_io_message = [
             "message",
@@ -244,24 +292,20 @@ class SwegonCasaClient:
             f"42{json.dumps(socket_io_message, separators=(',', ':'))}"
         )
 
-    async def async_write(self, object_id: str, value: int | float) -> None:
+    async def async_write(
+        self,
+        object_id: str,
+        value: int | float,
+    ) -> None:
+        """Write a value to a Swegon CASA object."""
+        _debug(
+            "Writing Swegon CASA object %s with value %r",
+            object_id,
+            value,
+        )
+
         message = {
-            "jsonrpc": "2.0",
-            "id": 5,
-            "method": "write",
-            "params": {
-                "objects": [
-                    {
-                        "id": object_id,
-                        "device": DEVICE_ADDRESS,
-                        "properties": {
-                            PROPERTY_VALUE: {
-                                "value": value,
-                            }
-                        },
-                    }
-                ]
-            },
+            # ...
         }
 
         await self._async_send_rpc(message)
@@ -272,6 +316,7 @@ class SwegonCasaClient:
                 await asyncio.sleep(KEEPALIVE_INTERVAL)
 
                 if self._websocket:
+                    _debug("Sending Swegon CASA keepalive pong")
                     await self._websocket.send("3")
 
         except asyncio.CancelledError:
@@ -295,7 +340,7 @@ class SwegonCasaClient:
             self._notify_callbacks({"connected": False})
 
     async def _async_handle_message(self, raw: str) -> None:
-        _LOGGER.debug("Swegon message: %s", raw)
+        _debug("Received raw Swegon CASA message: %s", raw)
 
         if raw.startswith("0"):
             await self._async_send_connect_packet()
@@ -328,6 +373,11 @@ class SwegonCasaClient:
 
         if rpc_message.get("method") == "device_connected":
             self._connected = True
+
+            _debug(
+                "Swegon CASA device connected: %s",
+                rpc_message.get("params", {}),
+            )
             await self._async_subscribe()
 
             self._notify_callbacks(
@@ -356,8 +406,8 @@ class SwegonCasaClient:
 
                 property_value = property_data.get("value")
 
-                _LOGGER.debug(
-                    "Swegon object update: object=%s property=%s value=%r",
+                _debug(
+                    "Swegon CASA object update: object=%s property=%s value=%r",
                     object_id,
                     property_id,
                     property_value,
@@ -369,8 +419,8 @@ class SwegonCasaClient:
             if object_id not in self._seen_object_ids:
                 self._seen_object_ids.add(object_id)
 
-                _LOGGER.warning(
-                    "Swegon object discovered: object=%s properties=%s",
+                debug(
+                    "First update for Swegon CASA object %s: properties=%s",
                     object_id,
                     properties,
                 )
@@ -379,6 +429,11 @@ class SwegonCasaClient:
                 updates[object_id] = value
 
         if updates:
+            _debug(
+                "Forwarding %s Swegon CASA value update(s): %s",
+                len(updates),
+                updates,
+            )
             self._notify_callbacks(
                 {
                     "connected": True,
@@ -394,6 +449,10 @@ class SwegonCasaClient:
                 _LOGGER.exception("Swegon callback failed")
 
     async def async_disconnect(self) -> None:
+        _LOGGER.info(
+            "Disconnecting from Swegon CASA device %s",
+            self._device_id,
+        )
         self._closing = True
 
         for task in (self._listen_task, self._keepalive_task):
@@ -402,9 +461,15 @@ class SwegonCasaClient:
 
         if self._websocket:
             await self._websocket.close()
+        
+        _debug(
+            "Swegon CASA device %s disconnected",
+            self._device_id,
+        )
 
         self._websocket = None
         self._connected = False
+        
 
     @staticmethod
     def _iso_timestamp() -> str:

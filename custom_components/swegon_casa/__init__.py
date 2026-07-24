@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
@@ -56,6 +58,11 @@ async def async_setup_entry(
     await hass.config_entries.async_forward_entry_setups(
         entry,
         PLATFORMS,
+    )
+
+    _LOGGER.info(
+    "Swegon CASA integration started for %s",
+    entry.title,
     )
 
     return True
