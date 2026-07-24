@@ -1,4 +1,4 @@
-<p align="center">
+<p align="left">
   <img src="images/logo.png" width="180">
 </p>
 # Swegon CASA integration for Home Assistant
