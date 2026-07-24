@@ -24,7 +24,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-DEBUG_LOGGING = True
+DEBUG_LOGGING = False
 
 # Object discovery is separate from normal detailed logging.
 # Enabling this subscribes to a large object range.
