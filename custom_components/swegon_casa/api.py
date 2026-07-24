@@ -165,6 +165,7 @@ class SwegonCasaClient:
             self._websocket = await websockets.connect(
                 WEBSOCKET_URL,
                 origin=ORIGIN,
+                ssl=self._ssl_context,
                 open_timeout=20,
                 close_timeout=10,
             )
