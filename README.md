@@ -1,6 +1,3 @@
-<p align="left">
-  <img src="images/logo.png" width="180">
-</p>
 # Swegon CASA integration for Home Assistant
 
 Swegon CASA custom integration for Home Assistant.
