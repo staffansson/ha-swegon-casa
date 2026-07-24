@@ -62,7 +62,7 @@
         "name": "Boost time remaining"
       },
       "operating_status": {
-        "name": "Current status",
+        "name": "Current operating status",
         "state": {
           "home": "Home",
           "away": "Away",

@@ -62,7 +62,7 @@
         "name": "Boost-timer"
       },
       "operating_status": {
-        "name": "Aktuell status",
+        "name": "Aktuell driftstatus",
         "state": {
           "home": "Hemma",
           "away": "Borta",
