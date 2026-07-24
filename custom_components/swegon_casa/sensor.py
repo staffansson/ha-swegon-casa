@@ -415,30 +415,10 @@ class SwegonCasaOperatingStatusSensor(
             values.get(OBJECT_FAN_MODE)
         )
 
-        summer_night_boost = _as_float(
-            values.get(OBJECT_SUMMER_NIGHT_COOLING_BOOST)
-        )
-
-        humidity_boost = _as_float(
-            values.get(OBJECT_HUMIDITY_BOOST)
-        )
-
-        # Priority:
-        # 1. Stopped
-        # 2. Fireplace
-        # 3. Smart functions
-        # 4. Modes
-
         if power_off_value == 1:
             return STATUS_OFF
 
         if fireplace_value == 1:
             return STATUS_FIREPLACE
-
-        if summer_night_boost is not None and summer_night_boost > 0:
-            return STATUS_SUMMER_NIGHT
-
-        if humidity_boost is not None and humidity_boost > 0:
-            return STATUS_AUTO_HUMIDITY
 
         return FAN_VALUE_TO_STATUS.get(fan_mode_value)
