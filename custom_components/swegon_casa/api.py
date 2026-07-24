@@ -32,9 +32,6 @@ DEBUG_DISCOVER_OBJECTS = False
 DEBUG_OBJECT_ID_MIN = 1
 DEBUG_OBJECT_ID_MAX = 500
 
-if DEBUG_LOGGING:
-    _LOGGER.setLevel(logging.DEBUG)
-
 def _debug(message: str, *args: Any) -> None:
     """Log detailed protocol information when debug is enabled."""
     if DEBUG_LOGGING:
