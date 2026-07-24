@@ -21,6 +21,7 @@ from .api import (
 from .const import CONF_DEVICE_ID, PLATFORMS
 from .coordinator import SwegonCasaCoordinator
 
+_LOGGER = logging.getLogger(__name__)
 
 type SwegonCasaConfigEntry = ConfigEntry[
     SwegonCasaCoordinator
@@ -58,11 +59,6 @@ async def async_setup_entry(
     await hass.config_entries.async_forward_entry_setups(
         entry,
         PLATFORMS,
-    )
-
-    _LOGGER.info(
-    "Swegon CASA integration started for %s",
-    entry.title,
     )
 
     return True

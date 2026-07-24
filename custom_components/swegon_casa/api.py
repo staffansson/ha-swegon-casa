@@ -239,7 +239,7 @@ class SwegonCasaClient:
                 )
             ]
 
-            _LOGGER.debug(
+            _LOGGER.warning(
                 "Swegon CASA object discovery is enabled; subscribing to objects %s-%s",
                 DEBUG_OBJECT_ID_MIN,
                 DEBUG_OBJECT_ID_MAX,
@@ -247,11 +247,12 @@ class SwegonCasaClient:
         else:
             subscribed_object_ids = list(SUBSCRIBED_OBJECTS)
         
-            _debug(
+        _debug(
             "Subscribing to %s Swegon CASA objects: %s",
             len(subscribed_object_ids),
             subscribed_object_ids,
-)
+        )
+
         subscribe_message = {
             "jsonrpc": "2.0",
             "id": 2,
@@ -305,7 +306,22 @@ class SwegonCasaClient:
         )
 
         message = {
-            # ...
+            "jsonrpc": "2.0",
+            "id": 5,
+            "method": "write",
+            "params": {
+                "objects": [
+                    {
+                        "id": object_id,
+                        "device": DEVICE_ADDRESS,
+                        "properties": {
+                            PROPERTY_VALUE: {
+                                "value": value,
+                            }
+                        },
+                    }
+                ]
+            },
         }
 
         await self._async_send_rpc(message)
@@ -419,7 +435,7 @@ class SwegonCasaClient:
             if object_id not in self._seen_object_ids:
                 self._seen_object_ids.add(object_id)
 
-                debug(
+                _debug(
                     "First update for Swegon CASA object %s: properties=%s",
                     object_id,
                     properties,
