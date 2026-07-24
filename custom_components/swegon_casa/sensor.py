@@ -49,7 +49,7 @@ STATUS_TRAVEL = "travel"
 STATUS_FIREPLACE = "fireplace"
 STATUS_OFF = "off"
 STATUS_AUTO_HUMIDITY = "automatic_humidity"
-STATUS_SUMMER_NIGHT = "SUMMER_NIGHT_cooling"
+STATUS_SUMMER_NIGHT = "summer_night_cooling"
 
 OPERATING_STATUS_OPTIONS = [
     STATUS_HOME,
