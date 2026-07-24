@@ -214,8 +214,6 @@ async def async_setup_entry(
         )
     )
 
-    async_add_entities(entities)
-
     entities.extend(
     [
         SwegonCasaFunctionStatusSensor(
@@ -252,7 +250,7 @@ async def async_setup_entry(
         ),
     ]
 )
-
+    async_add_entities(entities)
 
 class SwegonCasaSensor(SwegonCasaEntity, SensorEntity):
     entity_description: SwegonSensorDescription
