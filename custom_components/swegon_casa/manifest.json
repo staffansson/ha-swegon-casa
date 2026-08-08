@@ -1,7 +1,7 @@
 {
   "domain": "swegon_casa",
   "name": "Swegon CASA Smart",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "codeowners": ["@staffansson"],
   "config_flow": true,
   "documentation": "https://github.com/staffansson/ha-swegon-casa",

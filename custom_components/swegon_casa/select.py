@@ -51,6 +51,14 @@ FAN_VALUE_TO_MODE = {
     4: MODE_TRAVEL,
 }
 
+FAN_MODE_TO_VALUE = {
+    MODE_OFF: 0,
+    MODE_AWAY: 1,
+    MODE_HOME: 2,
+    MODE_BOOST: 3,
+    MODE_TRAVEL: 4,
+}
+
 SMART_HUMIDITY_OPTIONS = [
     LEVEL_OFF,
     LEVEL_LOW,
@@ -241,7 +249,7 @@ class SwegonCasaModeSelect(SwegonCasaEntity, SelectEntity):
             )
             return
 
-        fan_mode_value = FAN_VALUE_TO_MODE.get(option)
+        fan_mode_value = FAN_MODE_TO_VALUE.get(option)
 
         if fan_mode_value is None:
             raise ValueError(
